@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROXY MASTER | Generador de Tráfico Web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-green: #0aff0a;
+      --neon-green-glow: 0 0 10px #0aff0a, 0 0 20px #0aff0a, 0 0 30px #0aff0a;
+      --dark-bg: #000000;
+      --panel-bg: rgba(10, 10, 10, 0.8);
+      --grid-line: rgba(10, 255, 10, 0.2);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background-color: var(--dark-bg);
+      color: white;
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 30px 30px;
+      position: relative;
+    }
+    
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(10, 255, 10, 0.1) 0%, rgba(0, 0, 0, 0.9) 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: var(--neon-green);
+      text-shadow: var(--neon-green-glow);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.7);
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      background: var(--panel-bg);
+      border: 1px solid var(--neon-green);
+      box-shadow: 0 0 10px rgba(10, 255, 10, 0.3);
+      border-radius: 5px;
+      padding: 10px 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--neon-green);
+      text-shadow: 0 0 5px rgba(10, 255, 10, 0.7);
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
+    }
+    
+    .main-content {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+    
+    .control-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--neon-green);
+      box-shadow: 0 0 10px rgba(10, 255, 10, 0.3);
+      border-radius: 5px;
+      padding: 20px;
+      height: fit-content;
+    }
+    
+    .panel-section {
+      margin-bottom: 25px;
+    }
+    
+    .panel-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      color: var(--neon-green);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .panel-title::before {
+      content: "//";
+      margin-right: 10px;
+    }
+    
+    .input-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.9rem;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(10, 255, 10, 0.5);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 3px;
+      font-family: 'Rajdhani', sans-serif;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--neon-green);
+      box-shadow: 0 0 5px rgba(10, 255, 10, 0.7);
+    }
+    
+    .btn {
+      background: transparent;
+      color: var(--neon-green);
+      border: 1px solid var(--neon-green);
+      padding: 10px 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(10, 255, 10, 0.4), transparent);
+      transition: all 0.5s ease;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover {
+      background: rgba(10, 255, 10, 0.1);
+      box-shadow: 0 0 10px rgba(10, 255, 10, 0.5);
+    }
+    
+    .btn-primary {
+      background: rgba(10, 255, 10, 0.2);
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .proxy-list {
+      height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.8rem;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(10, 255, 10, 0.5);
+      padding: 10px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .proxy-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    
+    .proxy-list::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+    }
+    
+    .proxy-list::-webkit-scrollbar-thumb {
+      background: var(--neon-green);
+    }
+    
+    .proxy-item {
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(10, 255, 10, 0.2);
+    }
+    
+    .proxy-item.active {
+      color: var(--neon-green);
+    }
+    
+    .browser-container {
+      background: var(--panel-bg);
+      border: 1px solid var(--neon-green);
+      box-shadow: 0 0 10px rgba(10, 255, 10, 0.3);
+      border-radius: 5px;
+      padding: 20px;
+      position: relative;
+    }
+    
+    .browser-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid rgba(10, 255, 10, 0.3);
+      padding-bottom: 15px;
+    }
+    
+    .browser-controls {
+      display: flex;
+      gap: 5px;
+      margin-right: 15px;
+    }
+    
+    .browser-control {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    
+    .browser-url {
+      flex-grow: 1;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(10, 255, 10, 0.5);
+      color: var(--neon-green);
+      padding: 8px 12px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .browser-url::before {
+      content: "🔒";
+      margin-right: 5px;
+      font-size: 0.8rem;
+    }
+    
+    .browser-frame {
+      width: 100%;
+      height: 700px;
+      border: none;
+      background: white;
+      border-radius: 3px;
+    }
+    
+    .connection-info {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid var(--neon-green);
+      padding: 10px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.8);
+      z-index: 10;
+    }
+    
+    .connection-status {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--neon-green);
+      margin-right: 5px;
+      box-shadow: 0 0 5px var(--neon-green);
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+    
+    .proxy-type-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 10px;
+    }
+    
+    .proxy-badge {
+      background: rgba(10, 255, 10, 0.1);
+      border: 1px solid rgba(10, 255, 10, 0.5);
+      color: var(--neon-green);
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .proxy-badge:hover, .proxy-badge.active {
+      background: rgba(10, 255, 10, 0.3);
+      box-shadow: 0 0 5px rgba(10, 255, 10, 0.5);
+    }
+    
+    .behavior-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .behavior-option {
+      display: flex;
+      align-items: center;
+    }
+    
+    .behavior-option input[type="checkbox"] {
+      width: auto;
+      margin-right: 5px;
+    }
+    
+    .logs-container {
+      margin-top: 20px;
+      background: var(--panel-bg);
+      border: 1px solid var(--neon-green);
+      box-shadow: 0 0 10px rgba(10, 255, 10, 0.3);
+      border-radius: 5px;
+      padding: 20px;
+    }
+    
+    .logs-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      color: var(--neon-green);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .logs-title::before {
+      content: "//";
+      margin-right: 10px;
+    }
+    
+    .logs {
+      height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.8rem;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(10, 255, 10, 0.5);
+      padding: 10px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .log-entry {
+      margin-bottom: 5px;
+      border-bottom: 1px solid rgba(10, 255, 10, 0.1);
+      padding-bottom: 5px;
+    }
+    
+    .log-time {
+      color: var(--neon-green);
+      margin-right: 5px;
+    }
+    
+    .log-type {
+      margin-right: 5px;
+    }
+    
+    .log-type.info {
+      color: #0aafff;
+    }
+    
+    .log-type.success {
+      color: var(--neon-green);
+    }
+    
+    .log-type.warning {
+      color: #ffaa0a;
+    }
+    
+    .log-type.error {
+      color: #ff0a0a;
+    }
+    
+    .glitch-effect {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .glitch-effect::before,
+    .glitch-effect::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .glitch-effect::before {
+      left: 2px;
+      text-shadow: -1px 0 #ff00ff;
+      clip: rect(44px, 450px, 56px, 0);
+      animation: glitch-anim 5s infinite linear alternate-reverse;
+    }
+    
+    .glitch-effect::after {
+      left: -2px;
+      text-shadow: -1px 0 #00ffff;
+      clip: rect(44px, 450px, 56px, 0);
+      animation: glitch-anim2 5s infinite linear alternate-reverse;
+    }
+    
+    @keyframes glitch-anim {
+      0% {
+        clip: rect(42px, 9999px, 44px, 0);
+      }
+      5% {
+        clip: rect(12px, 9999px, 59px, 0);
+      }
+      10% {
+        clip: rect(48px, 9999px, 29px, 0);
+      }
+      15.0% {
+        clip: rect(42px, 9999px, 73px, 0);
+      }
+      20% {
+        clip: rect(63px, 9999px, 27px, 0);
+      }
+      25% {
+        clip: rect(34px, 9999px, 55px, 0);
+      }
+      30.0% {
+        clip: rect(86px, 9999px, 73px, 0);
+      }
+      35% {
+        clip: rect(20px, 9999px, 20px, 0);
+      }
+      40% {
+        clip: rect(26px, 9999px, 60px, 0);
+      }
+      45% {
+        clip: rect(25px, 9999px, 66px, 0);
+      }
+      50% {
+        clip: rect(57px, 9999px, 98px, 0);
+      }
+      55.0% {
+        clip: rect(5px, 9999px, 46px, 0);
+      }
+      60.0% {
+        clip: rect(82px, 9999px, 31px, 0);
+      }
+      65% {
+        clip: rect(54px, 9999px, 27px, 0);
+      }
+      70% {
+        clip: rect(28px, 9999px, 99px, 0);
+      }
+      75% {
+        clip: rect(45px, 9999px, 69px, 0);
+      }
+      80% {
+        clip: rect(23px, 9999px, 85px, 0);
+      }
+      85.0% {
+        clip: rect(54px, 9999px, 84px, 0);
+      }
+      90% {
+        clip: rect(45px, 9999px, 47px, 0);
+      }
+      95% {
+        clip: rect(37px, 9999px, 20px, 0);
+      }
+      100% {
+        clip: rect(4px, 9999px, 91px, 0);
+      }
+    }
+    
+    @keyframes glitch-anim2 {
+      0% {
+        clip: rect(65px, 9999px, 100px, 0);
+      }
+      5% {
+        clip: rect(52px, 9999px, 74px, 0);
+      }
+      10% {
+        clip: rect(79px, 9999px, 85px, 0);
+      }
+      15.0% {
+        clip: rect(75px, 9999px, 5px, 0);
+      }
+      20% {
+        clip: rect(67px, 9999px, 61px, 0);
+      }
+      25% {
+        clip: rect(14px, 9999px, 79px, 0);
+      }
+      30.0% {
+        clip: rect(1px, 9999px, 66px, 0);
+      }
+      35% {
+        clip: rect(86px, 9999px, 30px, 0);
+      }
+      40% {
+        clip: rect(23px, 9999px, 98px, 0);
+      }
+      45% {
+        clip: rect(85px, 9999px, 72px, 0);
+      }
+      50% {
+        clip: rect(71px, 9999px, 75px, 0);
+      }
+      55.0% {
+        clip: rect(2px, 9999px, 48px, 0);
+      }
+      60.0% {
+        clip: rect(30px, 9999px, 16px, 0);
+      }
+      65% {
+        clip: rect(59px, 9999px, 50px, 0);
+      }
+      70% {
+        clip: rect(41px, 9999px, 62px, 0);
+      }
+      75% {
+        clip: rect(2px, 9999px, 82px, 0);
+      }
+      80% {
+        clip: rect(47px, 9999px, 73px, 0);
+      }
+      85.0% {
+        clip: rect(3px, 9999px, 27px, 0);
+      }
+      90% {
+        clip: rect(26px, 9999px, 55px, 0);
+      }
+      95% {
+        clip: rect(42px, 9999px, 97px, 0);
+      }
+      100% {
+        clip: rect(38px, 9999px, 49px, 0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 class="glitch-effect" data-text="PROXY MASTER">PROXY MASTER</h1>
+      <div class="subtitle">GENERADOR DE TRÁFICO WEB AVANZADO</div>
+    </header>
+    
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-value" id="active-proxies">5,231</div>
+        <div class="stat-label">Proxies Activas</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="total-requests">1,287,456</div>
+        <div class="stat-label">Solicitudes Totales</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="success-rate">98.7%</div>
+        <div class="stat-label">Tasa de Éxito</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="avg-response">0.82s</div>
+        <div class="stat-label">Tiempo de Respuesta</div>
+      </div>
+    </div>
+    
+    <div class="main-content">
+      <div class="control-panel">
+        <div class="panel-section">
+          <div class="panel-title">CONFIGURACIÓN DE PROXY</div>
+          
+          <div class="input-group">
+            <label for="target-url">URL Objetivo</label>
+            <input type="text" id="target-url" placeholder="https://ejemplo.com" value="https://example.com">
+          </div>
+          
+          <div class="input-group">
+            <label for="proxy-type">Tipo de Proxy</label>
+            <select id="proxy-type">
+              <option value="all">Todos los tipos</option>
+              <option value="http">HTTP/HTTPS</option>
+              <option value="socks4">SOCKS4</option>
+              <option value="socks5">SOCKS5</option>
+              <option value="residential">Residencial</option>
+            </select>
+          </div>
+          
+          <div class="proxy-type-badges">
+            <div class="proxy-badge active">Públicas</div>
+            <div class="proxy-badge">Residenciales</div>
+            <div class="proxy-badge">Datacenter</div>
+            <div class="proxy-badge">Elite</div>
+            <div class="proxy-badge">Anónimas</div>
+          </div>
+          
+          <div class="input-group">
+            <label for="max-time">Tiempo Máximo de Conexión (seg)</label>
+            <input type="number" id="max-time" min="1" max="300" value="60">
+          </div>
+          
+          <button class="btn btn-primary" id="start-btn">INICIAR TRÁFICO</button>
+        </div>
+        
+        <div class="panel-section">
+          <div class="panel-title">COMPORTAMIENTO HUMANO</div>
+          
+          <div class="behavior-options">
+            <div class="behavior-option">
+              <input type="checkbox" id="scroll-behavior" checked>
+              <label for="scroll-behavior">Scroll Aleatorio</label>
+            </div>
+            <div class="behavior-option">
+              <input type="checkbox" id="click-behavior" checked>
+              <label for="click-behavior">Clics Aleatorios</label>
+            </div>
+            <div class="behavior-option">
+              <input type="checkbox" id="mouse-movement" checked>
+              <label for="mouse-movement">Movimiento de Ratón</label>
+            </div>
+            <div class="behavior-option">
+              <input type="checkbox" id="form-interaction">
+              <label for="form-interaction">Interacción con Formularios</label>
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <label for="visit-duration">Duración de Visita (seg)</label>
+            <input type="number" id="visit-duration" min="5" max="600" value="45">
+          </div>
+        </div>
+        
+        <div class="panel-section">
+          <div class="panel-title">PROXIES ACTIVAS</div>
+          <div class="proxy-list" id="proxy-list">
+            <div class="proxy-item active">185.199.229.156:7492 - Elite - 58s</div>
+            <div class="proxy-item">23.94.73.246:1080 - SOCKS5 - 43s</div>
+            <div class="proxy-item">103.152.112.162:80 - HTTP - 22s</div>
+            <div class="proxy-item">45.79.27.210:1080 - SOCKS4 - 17s</div>
+            <div class="proxy-item">193.106.231.145:4145 - SOCKS5 - 39s</div>
+            <div class="proxy-item">185.200.38.235:10820 - HTTP - 51s</div>
+            <div class="proxy-item">45.132.75.19:10000 - Residencial - 28s</div>
+            <div class="proxy-item">45.132.75.19:10001 - Residencial - 33s</div>
+            <div class="proxy-item">45.132.75.19:10002 - Residencial - 41s</div>
+            <div class="proxy-item">45.132.75.19:10003 - Residencial - 19s</div>
+          </div>
+          
+          <div class="input-group">
+            <label for="custom-proxies">Añadir Proxies Personalizadas</label>
+            <textarea id="custom-proxies" placeholder="IP:Puerto (una por línea)" rows="3"></textarea>
+          </div>
+          
+          <button class="btn" id="add-proxies-btn">AÑADIR PROXIES</button>
+        </div>
+      </div>
+      
+      <div>
+        <div class="browser-container">
+          <div class="browser-header">
+            <div class="browser-controls">
+              <div class="browser-control" style="background: #ff5f57;"></div>
+              <div class="browser-control" style="background: #ffbd2e;"></div>
+              <div class="browser-control" style="background: #28ca41;"></div>
+            </div>
+            <div class="browser-url" id="current-url">https://example.com</div>
+          </div>
+          
+          <div class="connection-info">
+            <div class="connection-status">
+              <div class="status-indicator"></div>
+              <span>Conectado vía 185.199.229.156:7492</span>
+            </div>
+            <div>Tiempo restante: <span id="time-remaining">58s</span></div>
+          </div>
+          
+          <iframe src="https://example.com" class="browser-frame" id="browser-frame"></iframe>
+        </div>
+        
+        <div class="logs-container">
+          <div class="logs-title">REGISTRO DE ACTIVIDAD</div>
+          <div class="logs" id="activity-logs">
+            <div class="log-entry">
+              <span class="log-time">[10:45:23]</span>
+              <span class="log-type info">[INFO]</span>
+              <span class="log-message">Sistema iniciado. 5,231 proxies cargadas correctamente.</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-time">[10:45:24]</span>
+              <span class="log-type success">[SUCCESS]</span>
+              <span class="log-message">Conexión establecida con 185.199.229.156:7492 (Elite).</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-time">[10:45:25]</span>
+              <span class="log-type info">[INFO]</span>
+              <span class="log-message">Navegando a https://example.com</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-time">[10:45:27]</span>
+              <span class="log-type success">[SUCCESS]</span>
+              <span class="log-message">Página cargada correctamente (200 OK).</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-time">[10:45:30]</span>
+              <span class="log-type info">[INFO]</span>
+              <span class="log-message">Simulando comportamiento: scroll hacia abajo.</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-time">[10:45:35]</span>
+              <span class="log-type info">[INFO]</span>
+              <span class="log-message">Simulando comportamiento: clic en elemento.</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-time">[10:45:40]</span>
+              <span class="log-type warning">[WARNING]</span>
+              <span class="log-message">Proxy 23.94.73.246:1080 con latencia alta (1.2s).</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-time">[10:45:45]</span>
+              <span class="log-type error">[ERROR]</span>
+              <span class="log-message">Proxy 103.152.112.162:
+              <span class="log-message">Proxy 103.152.112.162:80 desconectado. Cambiando a nueva proxy.</span>
+            </div>
+            <div class="log-entry">
+              <span class="log-time">[10:45:46]</span>
+              <span class="log-type success">[SUCCESS]</span>
+              <span class="log-message">Nueva conexión establecida con 45.79.27.210:1080 (SOCKS4).</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Datos de proxies simulados
+    const proxyData = {
+      public: [
+        { ip: "185.199.229.156", port: "7492", type: "Elite", country: "US" },
+        { ip: "23.94.73.246", port: "1080", type: "SOCKS5", country: "US" },
+        { ip: "103.152.112.162", port: "80", type: "HTTP", country: "IN" },
+        { ip: "45.79.27.210", port: "1080", type: "SOCKS4", country: "US" },
+        { ip: "193.106.231.145", port: "4145", type: "SOCKS5", country: "RU" },
+        { ip: "185.200.38.235", port: "10820", type: "HTTP", country: "DE" },
+        { ip: "45.132.75.19", port: "10000", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10001", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10002", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10003", type: "Residencial", country: "NL" }
+      ],
+      residential: [
+        { ip: "45.132.75.19", port: "10000", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10001", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10002", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10003", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10004", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10005", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10006", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10007", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10008", type: "Residencial", country: "NL" },
+        { ip: "45.132.75.19", port: "10009", type: "Residencial", country: "NL" }
+      ],
+      datacenter: [
+        { ip: "185.199.229.156", port: "7492", type: "Elite", country: "US" },
+        { ip: "23.94.73.246", port: "1080", type: "SOCKS5", country: "US" },
+        { ip: "103.152.112.162", port: "80", type: "HTTP", country: "IN" },
+        { ip: "45.79.27.210", port: "1080", type: "SOCKS4", country: "US" },
+        { ip: "193.106.231.145", port: "4145", type: "SOCKS5", country: "RU" }
+      ]
+    };
+
+    // Función para generar proxies aleatorias
+    function generateRandomProxies(count = 5000) {
+      const types = ["HTTP", "SOCKS4", "SOCKS5", "Elite", "Anónima", "Residencial"];
+      const countries = ["US", "DE", "NL", "RU", "FR", "GB", "CA", "JP", "BR", "IN"];
+      const proxies = [];
+      
+      for (let i = 0; i < count; i++) {
+        const ip = `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+        const port = Math.floor(Math.random() * 65000) + 1000;
+        const type = types[Math.floor(Math.random() * types.length)];
+        const country = countries[Math.floor(Math.random() * countries.length)];
+        
+        proxies.push({ ip, port: port.toString(), type, country });
+      }
+      
+      return proxies;
+    }
+
+    // Generar 5000 proxies aleatorias
+    const allProxies = generateRandomProxies(5000);
+    
+    // Elementos DOM
+    const startBtn = document.getElementById('start-btn');
+    const addProxiesBtn = document.getElementById('add-proxies-btn');
+    const targetUrlInput = document.getElementById('target-url');
+    const proxyTypeSelect = document.getElementById('proxy-type');
+    const maxTimeInput = document.getElementById('max-time');
+    const visitDurationInput = document.getElementById('visit-duration');
+    const customProxiesTextarea = document.getElementById('custom-proxies');
+    const proxyList = document.getElementById('proxy-list');
+    const browserFrame = document.getElementById('browser-frame');
+    const currentUrl = document.getElementById('current-url');
+    const timeRemaining = document.getElementById('time-remaining');
+    const activityLogs = document.getElementById('activity-logs');
+    const proxyBadges = document.querySelectorAll('.proxy-badge');
+    
+    // Variables de estado
+    let isRunning = false;
+    let currentProxy = null;
+    let timeRemainingValue = parseInt(maxTimeInput.value);
+    let timerInterval = null;
+    let activeProxies = [];
+    let totalRequests = 0;
+    let successfulRequests = 0;
+    
+    // Actualizar estadísticas
+    function updateStats() {
+      document.getElementById('active-proxies').textContent = activeProxies.length.toLocaleString();
+      document.getElementById('total-requests').textContent = totalRequests.toLocaleString();
+      document.getElementById('success-rate').textContent = ((successfulRequests / Math.max(totalRequests, 1)) * 100).toFixed(1) + '%';
+      document.getElementById('avg-response').textContent = (Math.random() * 0.5 + 0.5).toFixed(2) + 's';
+    }
+    
+    // Inicializar estadísticas
+    activeProxies = allProxies;
+    updateStats();
+    
+    // Añadir log
+    function addLog(type, message) {
+      const now = new Date();
+      const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      
+      const logTime = document.createElement('span');
+      logTime.className = 'log-time';
+      logTime.textContent = `[${timeString}]`;
+      
+      const logType = document.createElement('span');
+      logType.className = `log-type ${type}`;
+      logType.textContent = `[${type.toUpperCase()}]`;
+      
+      const logMessage = document.createElement('span');
+      logMessage.className = 'log-message';
+      logMessage.textContent = message;
+      
+      logEntry.appendChild(logTime);
+      logEntry.appendChild(logType);
+      logEntry.appendChild(logMessage);
+      
+      activityLogs.insertBefore(logEntry, activityLogs.firstChild);
+      
+      // Limitar el número de logs mostrados
+      if (activityLogs.children.length > 100) {
+        activityLogs.removeChild(activityLogs.lastChild);
+      }
+    }
+    
+    // Seleccionar proxy aleatoria
+    function selectRandomProxy() {
+      const selectedType = proxyTypeSelect.value;
+      let filteredProxies = activeProxies;
+      
+      if (selectedType !== 'all') {
+        filteredProxies = activeProxies.filter(proxy => 
+          proxy.type.toLowerCase().includes(selectedType.toLowerCase())
+        );
+      }
+      
+      if (filteredProxies.length === 0) {
+        addLog('error', 'No hay proxies disponibles del tipo seleccionado.');
+        return null;
+      }
+      
+      const randomIndex = Math.floor(Math.random() * filteredProxies.length);
+      return filteredProxies[randomIndex];
+    }
+    
+    // Actualizar lista de proxies
+    function updateProxyList() {
+      proxyList.innerHTML = '';
+      
+      // Mostrar solo las primeras 10 proxies para no sobrecargar el DOM
+      const proxiesToShow = activeProxies.slice(0, 10);
+      
+      proxiesToShow.forEach((proxy, index) => {
+        const proxyItem = document.createElement('div');
+        proxyItem.className = 'proxy-item';
+        if (currentProxy && proxy.ip === currentProxy.ip && proxy.port === currentProxy.port) {
+          proxyItem.classList.add('active');
+        }
+        
+        const remainingTime = Math.floor(Math.random() * 60) + 1;
+        proxyItem.textContent = `${proxy.ip}:${proxy.port} - ${proxy.type} - ${remainingTime}s`;
+        
+        proxyList.appendChild(proxyItem);
+      });
+    }
+    
+    // Simular comportamiento humano
+    function simulateHumanBehavior() {
+      if (!isRunning) return;
+      
+      const behaviors = [];
+      
+      if (document.getElementById('scroll-behavior').checked) {
+        behaviors.push('scroll');
+      }
+      
+      if (document.getElementById('click-behavior').checked) {
+        behaviors.push('click');
+      }
+      
+      if (document.getElementById('mouse-movement').checked) {
+        behaviors.push('mouse');
+      }
+      
+      if (document.getElementById('form-interaction').checked) {
+        behaviors.push('form');
+      }
+      
+      if (behaviors.length === 0) return;
+      
+      const randomBehavior = behaviors[Math.floor(Math.random() * behaviors.length)];
+      
+      switch (randomBehavior) {
+        case 'scroll':
+          const scrollDirection = Math.random() > 0.7 ? 'arriba' : 'abajo';
+          addLog('info', `Simulando comportamiento: scroll hacia ${scrollDirection}.`);
+          break;
+        case 'click':
+          addLog('info', 'Simulando comportamiento: clic en elemento.');
+          break;
+        case 'mouse':
+          addLog('info', 'Simulando comportamiento: movimiento de ratón.');
+          break;
+        case 'form':
+          addLog('info', 'Simulando comportamiento: interacción con formulario.');
+          break;
+      }
+      
+      // Programar el próximo comportamiento
+      setTimeout(simulateHumanBehavior, Math.random() * 5000 + 2000);
+    }
+    
+    // Iniciar tráfico
+    function startTraffic() {
+      if (isRunning) return;
+      
+      const targetUrl = targetUrlInput.value.trim();
+      if (!targetUrl) {
+        addLog('error', 'Por favor, introduce una URL objetivo válida.');
+        return;
+      }
+      
+      isRunning = true;
+      startBtn.textContent = 'DETENER TRÁFICO';
+      
+      addLog('info', `Iniciando generación de tráfico hacia ${targetUrl}`);
+      
+      // Seleccionar proxy aleatoria
+      currentProxy = selectRandomProxy();
+      if (!currentProxy) {
+        isRunning = false;
+        startBtn.textContent = 'INICIAR TRÁFICO';
+        return;
+      }
+      
+      // Actualizar UI
+      currentUrl.textContent = targetUrl;
+      timeRemainingValue = parseInt(maxTimeInput.value);
+      timeRemaining.textContent = `${timeRemainingValue}s`;
+      
+      // Intentar cargar la URL en el iframe
+      try {
+        browserFrame.src = targetUrl;
+        addLog('info', `Navegando a ${targetUrl}`);
+        totalRequests++;
+        
+        // Simular éxito o error
+        setTimeout(() => {
+          if (Math.random() > 0.1) { // 90% de éxito
+            addLog('success', 'Página cargada correctamente (200 OK).');
+            successfulRequests++;
+          } else {
+            addLog('error', 'Error al cargar la página. Reintentando con otra proxy.');
+            changeProxy();
+          }
+          updateStats();
+        }, Math.random() * 2000 + 1000);
+        
+      } catch (error) {
+        addLog('error', `Error al cargar la URL: ${error.message}`);
+        changeProxy();
+      }
+      
+      // Actualizar lista de proxies
+      updateProxyList();
+      
+      // Iniciar temporizador
+      timerInterval = setInterval(() => {
+        timeRemainingValue--;
+        timeRemaining.textContent = `${timeRemainingValue}s`;
+        
+        if (timeRemainingValue <= 0) {
+          changeProxy();
+        }
+      }, 1000);
+      
+      // Iniciar simulación de comportamiento humano
+      simulateHumanBehavior();
+    }
+    
+    // Detener tráfico
+    function stopTraffic() {
+      if (!isRunning) return;
+      
+      isRunning = false;
+      startBtn.textContent = 'INICIAR TRÁFICO';
+      
+      clearInterval(timerInterval);
+      addLog('info', 'Generación de tráfico detenida.');
+    }
+    
+    // Cambiar a una nueva proxy
+    function changeProxy() {
+      clearInterval(timerInterval);
+      
+      addLog('info', `Cambiando proxy. Tiempo de conexión agotado para ${currentProxy.ip}:${currentProxy.port}.`);
+      
+      // Seleccionar nueva proxy
+      currentProxy = selectRandomProxy();
+      if (!currentProxy) {
+        stopTraffic();
+        return;
+      }
+      
+      addLog('success', `Nueva conexión establecida con ${currentProxy.ip}:${currentProxy.port} (${currentProxy.type}).`);
+      
+      // Actualizar UI
+      timeRemainingValue = parseInt(maxTimeInput.value);
+      timeRemaining.textContent = `${timeRemainingValue}s`;
+      updateProxyList();
+      
+      // Reiniciar temporizador
+      timerInterval = setInterval(() => {
+        timeRemainingValue--;
+        timeRemaining.textContent = `${timeRemainingValue}s`;
+        
+        if (timeRemainingValue <= 0) {
+          changeProxy();
+        }
+      }, 1000);
+      
+      // Recargar la página con la nueva proxy
+      const targetUrl = targetUrlInput.value.trim();
+      browserFrame.src = targetUrl;
+      totalRequests++;
+      
+      // Simular éxito o error
+      setTimeout(() => {
+        if (Math.random() > 0.1) { // 90% de éxito
+          addLog('success', 'Página cargada correctamente (200 OK).');
+          successfulRequests++;
+        } else {
+          addLog('error', 'Error al cargar la página. Reintentando con otra proxy.');
+          changeProxy();
+        }
+        updateStats();
+      }, Math.random() * 2000 + 1000);
+    }
+    
+    // Añadir proxies personalizadas
+    function addCustomProxies() {
+      const customProxiesText = customProxiesTextarea.value.trim();
+      if (!customProxiesText) return;
+      
+      const lines = customProxiesText.split('\n');
+      let addedCount = 0;
+      
+      lines.forEach(line => {
+        const parts = line.trim().split(':');
+        if (parts.length === 2) {
+          const ip = parts[0];
+          const port = parts[1];
+          
+          // Validar formato de IP
+          const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+          if (!ipPattern.test(ip)) return;
+          
+          // Validar puerto
+          const portNum = parseInt(port);
+          if (isNaN(portNum) || portNum < 1 || portNum > 65535) return;
+          
+          // Añadir proxy
+          activeProxies.push({
+            ip,
+            port,
+            type: 'Personalizada',
+            country: 'XX'
+          });
+          
+          addedCount++;
+        }
+      });
+      
+      if (addedCount > 0) {
+        addLog('success', `Se han añadido ${addedCount} proxies personalizadas.`);
+        updateProxyList();
+        updateStats();
+        customProxiesTextarea.value = '';
+      } else {
+        addLog('warning', 'No se han podido añadir proxies. Verifica el formato (IP:Puerto).');
+      }
+    }
+    
+    // Event listeners
+    startBtn.addEventListener('click', () => {
+      if (isRunning) {
+        stopTraffic();
+      } else {
+        startTraffic();
+      }
+    });
+    
+    addProxiesBtn.addEventListener('click', addCustomProxies);
+    
+    proxyBadges.forEach(badge => {
+      badge.addEventListener('click', () => {
+        proxyBadges.forEach(b => b.classList.remove('active'));
+        badge.classList.add('active');
+        
+        const proxyType = badge.textContent.toLowerCase();
+        let filteredProxies = allProxies;
+        
+        switch (proxyType) {
+          case 'públicas':
+            filteredProxies = allProxies.filter(p => p.type !== 'Residencial');
+            break;
+          case 'residenciales':
+            filteredProxies = allProxies.filter(p => p.type === 'Residencial');
+            break;
+          case 'datacenter':
+            filteredProxies = allProxies.filter(p => p.type !== 'Residencial' && p.type !== 'Anónima');
+            break;
+          case 'elite':
+            filteredProxies = allProxies.filter(p => p.type === 'Elite');
+            break;
+          case 'anónimas':
+            filteredProxies = allProxies.filter(p => p.type === 'Anónima');
+            break;
+        }
+        
+        activeProxies = filteredProxies;
+        updateProxyList();
+        updateStats();
+        addLog('info', `Filtro aplicado: ${proxyType}. ${activeProxies.length} proxies disponibles.`);
+      });
+    });
+    
+    // Inicializar logs
+    addLog('info', `Sistema iniciado. ${allProxies.length.toLocaleString()} proxies cargadas correctamente.`);
+    addLog('info', 'Fuentes de proxies: ProxyNova, FreeProxyList, GeoNode, ProxyScrape, Spys.one');
+    addLog('info', 'Listo para generar tráfico. Introduce una URL objetivo y haz clic en INICIAR TRÁFICO.');
+    
+    // Actualizar lista de proxies inicial
+    updateProxyList();
+  </script>
+</body>
+</html>
